@@ -6,24 +6,13 @@ const compose = (...args) => initial =>
 
 const curry = (fn, ...args1) => (...args2) => fn(...args1, ...args2)
 
-const addNodes = obj => obj.nodes.map(node => checkNode(node, obj.vertices))
+const addNodes = nodes => nodes.map(addNode)
 
-const addNode = (obj, vertices) => {
-  const node = Object.freeze({
-    item: obj,
-    successors: new Set(),
-    predecessors: new Set(),
-  })
-
-  vertices[node.item] = node
-
-  return node
-}
-
-const checkNode = (node, vertices) =>
-  !vertices[node]
-    ? addNode(node, vertices)
-    : vertices[node]
+const addNode = node => Object.freeze({
+  item: node,
+  successors: new Set(),
+  predecessors: new Set(),
+})
 
 const addEdge = nodes => {
   const from = Object.freeze(Object.assign({}, nodes[0]))
@@ -39,12 +28,9 @@ const addEdge = nodes => {
   return obj
 }
 
-const addNodeWithEdge = (nodes, vertices) => compose(
+const addNodeWithEdge = () => compose(
   addEdge,
-  addNodes,
-  () => {
-    return {nodes: nodes, vertices: vertices}
-  }
+  addNodes
 )
 
 const degree = (type, graph) => {
@@ -64,11 +50,7 @@ const degree = (type, graph) => {
 
 const outDegree = curry(degree, 'successors')
 const inDegree = curry(degree, 'predecessors')
-
-function graph(lists) {
-  const vertices = {}
-  return lists.map(nodes => addNodeWithEdge(nodes, vertices)())
-}
+const graph = pairs => pairs.map(pair => addNodeWithEdge()(pair))
 
 module.exports = {
   graph,
