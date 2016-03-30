@@ -3,15 +3,15 @@
 const isArray = (item) => Object.prototype.toString.call(item) === '[object Array]'
 
 class Graph {
-  constructor(lists) {
+  constructor(pairs) {
     this.vertices = new Map()
     this.edges = []
 
-    if (isArray(lists[0])) {
-      this.addNodes(lists)
+    if (isArray(pairs[0])) {
+      this.addNodes(pairs)
       this.addEdges(this.edges)
     } else {
-      this.addNodes(lists)
+      this.addNodes(pairs)
     }
   }
 
@@ -36,7 +36,9 @@ class Graph {
 
   addEdges(nodes) {
     for (let i = 1; i < nodes.length; i++) {
-      this.addEdge(nodes[i], nodes[i-1])
+      if (i % 2 !== 0) {
+        this.addEdge(nodes[i-1], nodes[i])
+      }
     }
   }
 

@@ -25,7 +25,8 @@ var curry = function curry(fn) {
  };
 };
 
-const isArray = (item) => Object.prototype.toString.call(item) === '[object Array]'
+const includes = (arr, item) => !!~arr.indexOf(item)
+const isArray = (item) => item instanceof Array
 
 const addNodes = (pairs, graph) => {
   if (graph === undefined) graph = []
@@ -38,22 +39,20 @@ const addNodes = (pairs, graph) => {
   }, graph)
 }
 
-const createNode = (node, graph) => {
-  if(graph.find(n => n.item === node)) {
-    return graph.find(n => n.item === node)
-  } else {
-    return Object.freeze({item: node, successors: new Set(), predecessors: new Set(),})
-  }
-}
+const createNode = (node, graph) =>
+  graph.find(n => n.item === node)
+    ? graph.find(n => n.item === node)
+    : Object.freeze({item: node, successors: new Set(), predecessors: new Set(),})
 
-const addEdge = (nodes) => {
-  const edges = []
-  const graph = nodes.slice()
+const addEdges = nodes => {
+  const graph = []
 
-  graph.reduce((from, to, i) => {
-    if (!from.successors.has(to) && !to.predecessors.has(from) && i % 2 !== 0) {
-      from.successors.add(to)
-      to.predecessors.add(from)
+  nodes.reduce((from, to, i) => {
+    if (i % 2 !== 0) {
+      addEdge(from, to)
+    }
+    if (!includes(graph, to)) {
+      graph.push(to)
     }
     return to
   })
@@ -61,21 +60,25 @@ const addEdge = (nodes) => {
   return graph
 }
 
+const addEdge = (first, second) => {
+  const from = Object.assign({}, first)
+  const to = Object.assign({}, second)
+
+  if (!from.successors.has(to)) {
+    from.successors.add(to)
+    to.predecessors.add(from)
+  }
+}
+
 const addNodeWithEdge = () => compose(
-  addEdge,
+  addEdges,
   addNodes
 )
 
 const degree = (type, graph) => {
   const degrees = []
-  const walked = []
 
-  graph.map(edge => {
-      if (walked.indexOf(edge.item) !== 0) {
-        degrees.push([edge.item, edge[type].size])
-      }
-      walked.push(edge.item)
-    })
+  graph.map(edge => degrees.push([edge.item, edge[type].size]))
 
   return degrees
 }
