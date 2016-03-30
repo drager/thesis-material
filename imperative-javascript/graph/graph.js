@@ -1,14 +1,60 @@
 'use strict'
 
+const isArray = (item) => Object.prototype.toString.call(item) === '[object Array]'
+
 class Graph {
   constructor(lists) {
     this.vertices = new Map()
+    this.edges = []
 
-    for (let i = 0; i < lists.length; i++) {
-      let firstNode = this.addNodeFor(lists[i][0])
-      let secondNode = this.addNodeFor(lists[i][1])
-      this.addEdgeFor(firstNode, secondNode)
+    if (isArray(lists[0])) {
+      this.addNodes(lists)
+      this.addEdges(this.edges)
+    } else {
+      this.addNodes(lists)
     }
+  }
+
+  addNodes(pairs) {
+    if (isArray(pairs)) {
+      for (let i = 0; i < pairs.length; i++) {
+        this.addNodes(pairs[i])
+      }
+      return
+    }
+
+    this.edges.push(this.addNode(pairs))
+  }
+
+  addNode(item) {
+    if (!this.vertices.has(item)) {
+      this.vertices.set(item, new Node(item))
+    }
+
+    return this.getNode(item)
+  }
+
+  addEdges(nodes) {
+    for (let i = 1; i < nodes.length; i++) {
+      this.addEdge(nodes[i], nodes[i-1])
+    }
+  }
+
+  addEdge(from, to) {
+    if (!from.successors.has(to)) {
+      from.successors.add(to)
+      to.predecessors.add(from)
+    }
+  }
+
+  getNode(item) {
+    let node
+
+    if (this.vertices.has(item)) {
+      node = this.vertices.get(item)
+    }
+
+    return node
   }
 
   outDegree() {
@@ -31,63 +77,6 @@ class Graph {
     return ind
   }
 
-  addNodeFor(item) {
-    if (item == null) {
-      throw Error('Item cannot be null!')
-    }
-
-    if (!this.containsNodeFor(item)) {
-      const node = new Node(item)
-      this.vertices.set(item, node)
-    }
-
-    return this.getNodeFor(item)
-  }
-
-  addEdgeFor(from, to) {
-    let isAdded = false
-
-    if (from == null || to == null) {
-      throw Error('From or to cannot be null!')
-    }
-
-    if (!from.hasSucc(to)) {
-      from.addSucc(to)
-      to.addPred(from)
-      isAdded = true
-    }
-
-    return isAdded
-  }
-
-  containsNodeFor(item) {
-    if (item == null) {
-      throw Error('Item cannot be null!')
-    }
-
-    return this.vertices.has(item)
-  }
-
-  getNodeFor(item) {
-    let found = false
-    let node = null
-
-    if (item == null) {
-      throw Error('Item cannot be null!')
-    }
-
-    if (this.vertices.has(item)) {
-      found = true
-      node = this.vertices.get(item)
-    }
-
-    if (!found) {
-      throw Error('Could not find item!')
-    }
-
-    return node
-  }
-
   nodeCount() {
     let count = 0
 
@@ -108,7 +97,6 @@ class Graph {
 
     return count
   }
-
 }
 
 class Node {
@@ -116,18 +104,6 @@ class Node {
     this.successors = new Set()
     this.predecessors = new Set()
     this.item = item
-  }
-
-  hasSucc(node) {
-    return this.successors.has(node)
-  }
-
-  addSucc(succ) {
-    this.successors.add(succ)
-  }
-
-  addPred(pred) {
-    this.predecessors.add(pred)
   }
 }
 
