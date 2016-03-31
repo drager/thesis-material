@@ -1,13 +1,11 @@
 'use strict'
 
-const isArray = (item) => Object.prototype.toString.call(item) === '[object Array]'
-
 class Graph {
   constructor(pairs) {
     this.vertices = new Map()
     this.edges = []
 
-    if (isArray(pairs[0])) {
+    if (pairs[0] instanceof Array) {
       this.addNodes(pairs)
       this.addEdges(this.edges)
     } else {
@@ -16,7 +14,7 @@ class Graph {
   }
 
   addNodes(pairs) {
-    if (isArray(pairs)) {
+    if (pairs instanceof Array) {
       for (let i = 0; i < pairs.length; i++) {
         this.addNodes(pairs[i])
       }
@@ -83,9 +81,7 @@ class Graph {
     let count = 0
 
     for (let graph of this.vertices.keys()) {
-      if (graph != null) {
-        count++
-      }
+      count++
     }
     return count
   }
@@ -94,7 +90,7 @@ class Graph {
     let count = 0
 
     for (let node of this.vertices.values()) {
-      count += node.outDegree()
+      count += node.predecessors.size
     }
 
     return count

@@ -1,9 +1,14 @@
-const graph = require('./graph').graph
-const outDegree = require('./graph').outDegree
-const inDegree = require('./graph').inDegree
+const graph = require('./graph')
+const outDegree = graph.outDegree
+const inDegree = graph.inDegree
+const edgeCount = graph.edgeCount
+const nodeCount = graph.nodeCount
 
-const g = graph([[1, 2], [1, 3]])
+const g = graph.graph([[1, 2], [1, 3]])
+//const g = graph([1, 2, 3])
 
 console.log('Graph', g)
 console.log('Outdegree', outDegree(g))
 console.log('Indegree', inDegree(g))
+console.log('Node count:', nodeCount(g))
+console.log('Edge count:', edgeCount(g))

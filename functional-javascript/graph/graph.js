@@ -1,104 +1,57 @@
 'use strict'
-var compose = function compose() {
- for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-   args[_key] = arguments[_key];
- }
 
- return function (initial) {
-   return args.reduceRight(function (result, fn) {
-     return fn(result);
-   }, initial);
- };
-};
+const compose = (...args) => initial =>
+  args.reduceRight((result, fn) =>
+    fn(result), initial)
 
-var curry = function curry(fn) {
- for (var _len2 = arguments.length, args1 = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-   args1[_key2 - 1] = arguments[_key2];
- }
+const curry = (fn, ...args) => (...args2) => fn(...args, ...args2)
 
- return function () {
-   for (var _len3 = arguments.length, args2 = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-     args2[_key3] = arguments[_key3];
-   }
+const getNodeFromGraph = (graph, node) => graph.find(n => n.item === node.item)
 
-   return fn.apply(undefined, args1.concat(args2));
- };
-};
+const createNode = item => Object.freeze({item, successors: [], predecessors: []})
 
-const includes = (arr, item) => !!~arr.indexOf(item)
-const isArray = (item) => item instanceof Array
-
-const addNodes = (pairs, graph) => {
-  if (graph === undefined) graph = []
-  return pairs.reduce((graph, item) => {
-    if (isArray(item)) {
-      return addNodes(item, graph)
-    }
-    graph.push(createNode(item, graph))
-    return graph
-  }, graph)
+const addEdge = (from, to, graph) => {
+  const nodes = [...graph]
+  from.successors.push(to)
+  to.predecessors.push(from)
+  getNodeFromGraph(graph, from) ? nodes.push(to) : nodes.push(from, to)
+  return nodes
 }
 
-const createNode = (node, graph) =>
-  graph.find(n => n.item === node)
-    ? graph.find(n => n.item === node)
-    : Object.freeze({item: node, successors: new Set(), predecessors: new Set(),})
+const addEdges = connect => nodes =>
+  nodes.reduce((graph, pair) => {
+    const to = pair[1]
+    const from = getNodeFromGraph(graph, pair[0]) || pair[0]
+    return Object.freeze(connect(from, to, graph))
+  }, [])
 
-const addEdges = nodes => {
-  const graph = []
-
-  nodes.reduce((from, to, i) => {
-    if (i % 2 !== 0) {
-      addEdge(from, to)
-    }
-    if (!includes(graph, to)) {
-      graph.push(to)
-    }
-    return to
-  })
-
-  return graph
-}
-
-const addEdge = (first, second) => {
-  const from = Object.assign({}, first)
-  const to = Object.assign({}, second)
-
-  if (!from.successors.has(to)) {
-    from.successors.add(to)
-    to.predecessors.add(from)
-  }
-}
-
-const addNodeWithEdge = () => compose(
-  addEdges,
-  addNodes
-)
-
-const degree = (type, graph) => {
-  const degrees = []
-
-  graph.map(edge => degrees.push([edge.item, edge[type].size]))
-
-  return degrees
-}
+const degree = (type, graph) => graph.map(edge => [edge.item, edge[type].length])
 
 const outDegree = curry(degree, 'successors')
 const inDegree = curry(degree, 'predecessors')
 
-const graph = pairs => {
-  let graph
-  if (isArray(pairs[0])) {
-    graph = addNodeWithEdge()(pairs)
-  } else {
-    graph = addNodes(pairs)
-  }
+const nodeCount = graph => graph.length
+const edgeCount = graph => graph.reduce((previous, current) =>
+  previous + current.predecessors.length, 0)
 
-  return graph
-}
+const deepConvertItemsToNodes = makeNode => items => items
+  .map(pair => convertItemsToNodes(makeNode)(pair))
+
+const convertItemsToNodes = makeNode => items => items.map(makeNode)
+
+const graph = items => items[0] instanceof Array
+  ? compose(
+      addEdges(addEdge),
+      deepConvertItemsToNodes(createNode)
+    )(Object.freeze(items))
+  : compose(
+      convertItemsToNodes(createNode)
+    )(Object.freeze(items))
 
 module.exports = {
   graph,
   outDegree,
-  inDegree
+  inDegree,
+  nodeCount,
+  edgeCount,
 }
