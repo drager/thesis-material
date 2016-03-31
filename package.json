@@ -1,0 +1,22 @@
+{
+  "name": "thesis-material",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "jshint": "git://github.com/drager/jshint"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drager/thesis-material.git"
+  },
+  "author": "Jesper Håkansson, Sherief Badran",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/drager/thesis-material/issues"
+  },
+  "homepage": "https://github.com/drager/thesis-material#readme"
+}
