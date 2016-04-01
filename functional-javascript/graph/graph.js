@@ -6,47 +6,62 @@ const compose = (...args) => initial =>
 
 const curry = (fn, ...args) => (...args2) => fn(...args, ...args2)
 
+const Graph = function(x) {
+  this.__value = x
+}
+
+Graph.of = function(x) {
+  return new Graph(x)
+}
+
+Graph.prototype.map = function(f) {
+  return Graph.of(f(this.__value))
+}
+
+const map = (f) => (F) => F.map(f)
+
 const getNodeFromGraph = (graph, node) => graph.find(n => n.item === node.item)
 
 const createNode = item => Object.freeze({item, successors: [], predecessors: []})
 
 const addEdge = (from, to, graph) => {
-  const nodes = [...graph]
   from.successors.push(to)
   to.predecessors.push(from)
-  getNodeFromGraph(graph, from) ? nodes.push(to) : nodes.push(from, to)
-  return nodes
+  getNodeFromGraph(graph, from) ? graph.push(to) : graph.push(from, to)
+  return graph
 }
 
-const addEdges = connect => nodes =>
-  nodes.reduce((graph, pair) => {
-    const to = pair[1]
-    const from = getNodeFromGraph(graph, pair[0]) || pair[0]
-    return Object.freeze(connect(from, to, graph))
-  }, [])
+const reduce = connect => Fnodes => Fnodes.reduce((graph, pair) => {
+  const to = pair[1]
+  const from = getNodeFromGraph(graph, pair[0]) || pair[0]
+  return connect(from, to, graph)
+}, [])
 
-const degree = (type, graph) => graph.map(edge => [edge.item, edge[type].length])
+const addEdges = connect => Fnodes => map(reduce(connect))(Fnodes)
+
+const degreeMap = type => graph => graph.map(edge => [edge.item, edge[type].length])
+
+const degree = (type, Fnodes) => map(degreeMap(type))(Fnodes)
 
 const outDegree = curry(degree, 'successors')
 const inDegree = curry(degree, 'predecessors')
 
-const nodeCount = graph => graph.length
-const edgeCount = graph => graph.reduce((previous, current) =>
-  previous + current.predecessors.length, 0)
+const nodeCount = Fnodes => map(graph => graph.length)(Fnodes)
+const edgeCount = Fnodes => map(graph => graph.reduce((previous, current) =>
+  previous + current.predecessors.length, 0))(Fnodes)
 
-const deepConvertItemsToNodes = makeNode => items => items
-  .map(pair => convertItemsToNodes(makeNode)(pair))
+const deepConvertItemsToNodes = makeNode => items => items.map(item => convertItemsToNodes(makeNode)(item))
 
 const convertItemsToNodes = makeNode => items => items.map(makeNode)
 
 const graph = items => items[0] instanceof Array
   ? compose(
       addEdges(addEdge),
-      deepConvertItemsToNodes(createNode)
-    )(Object.freeze(items))
+      map(deepConvertItemsToNodes(createNode))
+    )(Graph.of(items))
   : compose(
-      convertItemsToNodes(createNode)
-    )(Object.freeze(items))
+      map(convertItemsToNodes(createNode))
+    )(Graph.of(items))
 
 module.exports = {
   graph,
