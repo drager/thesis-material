@@ -20,11 +20,11 @@ Graph.prototype.map = function(f) {
 
 const map = (f) => (F) => F.map(f)
 
-const getExistingNodeFromGraph = (node, graph) => graph.find(n => n.item === node.item)
+const findExistingNode = (node, graph) => graph.find(n => n.item === node.item) || node
 
 const createNode = item => Object.freeze({item, successors: [], predecessors: []})
 
-const addNewNode = (node, graph) => !getExistingNodeFromGraph(node, graph) ?
+const addNewNode = (node, graph) => !graph.find(n => n.item === node.item) ?
                                       graph.concat([node]) : graph
 
 const addEdge = (from, to, graph) => {
@@ -33,16 +33,13 @@ const addEdge = (from, to, graph) => {
   from.successors.push(to)
   to.predecessors.push(from)
   const updatedGraph = addNewNode(to, copy)
-  const resultGraph = addNewNode(from, graphOne)
+  const resultGraph = addNewNode(from, updatedGraph)
   return resultGraph
 }
 
 const reduce = connect => Fnodes => Fnodes.reduce((graph, pair) => {
-  // TODO: getExistingNodeFromGraph could be returning a Maybe/Either instead, returning part[1] if node does not exist in graph,
-  // provided that graph in this context also is a Functor (Maybe), then our outer Graph would have to be a Maybe and the need of
-  // a Monad is at hand. Or different type of Functors are nested and we would need to implement Monad transformers.
-  const to = getExistingNodeFromGraph(pair[1], graph) || pair[1]
-  const from = getExistingNodeFromGraph(pair[0], graph) || pair[0]
+  const to = findExistingNode(pair[1], graph)
+  const from = findExistingNode(pair[0], graph)
   return connect(from, to, graph)
 }, [])
 
