@@ -22,7 +22,7 @@ const map = (f) => (F) => F.map(f)
 
 const findExistingNode = (node, graph) => graph.find(n => n.item === node.item) || node
 
-const createNode = item => Object.freeze({item, successors: [], predecessors: []})
+const createNode = item => Object.freeze({item, successors: [], predecessors: [], visited: false})
 
 const addNewNode = (node, graph) => !graph.find(n => n.item === node.item) ?
                                       graph.concat([node]) : graph
@@ -75,4 +75,8 @@ module.exports = {
   inDegree,
   nodeCount,
   edgeCount,
+  Graph,
+  curry,
+  compose,
+  map,
 }
