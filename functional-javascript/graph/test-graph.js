@@ -4,6 +4,7 @@ const inDegree = graph.inDegree
 const edgeCount = graph.edgeCount
 const nodeCount = graph.nodeCount
 const dfs = require('./dfs')
+const transitiveClosure = require('./transitive-closure')
 
 const g = graph.graph([['A', 'B'], ['A', 'C'], ['B', 'D'], ['C', 'G'], ['A', 'E'], ['E', 'F'], ['A', 'A']])
 // const g = graph.graph([[1, 2], [1, 3]])
@@ -23,3 +24,5 @@ const d = dfs.dfs(g, root).__value
 d.forEach(a => console.log(a.item))
 
 console.log('Is cyclic:', dfs.isCyclic(g).__value)
+
+console.log(transitiveClosure(g))
