@@ -1,6 +1,6 @@
 const Graph = require('./graph')
 const Dfs = require('./dfs')
-
+const computeClosure = require('./transitive-closure')
 
 // const graph = new Graph([[1, 2], [1, 3]])
 // const graph = new Graph([['A', 'B'], ['A', 'C'], ['B', 'D'], ['C', 'G'], ['A', 'E'], ['E', 'F'], ['A', 'A']])
@@ -21,8 +21,9 @@ const root = graph.vertices.get(0)
 // console.log('Edge count:', edgeCount(g))
 const dfs = new Dfs()
 // console.log(root)
-console.log('Deep first search:', dfs.dfs(graph, root))
+// console.log('Deep first search:', dfs.dfs(graph, root))
 
 // d.forEach(a => console.log(a.item))
 
 console.log('Is cyclic:', dfs.isCyclic(graph))
+console.log('TransitiveClosure:', computeClosure(graph))
