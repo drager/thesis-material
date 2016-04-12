@@ -8,7 +8,7 @@ const compose = graph.compose
 const curry = graph.curry
 
 const transitiveMap = functor => graph =>
-  graph.map(g => dfs.dfs(functor, g).__value)
+  graph.map(node => dfs.dfs(functor, node).join())
     .reduce((a, b) => a.concat(b), [])
 
 const transitiveClosure = fNodes => map(transitiveMap(fNodes))(fNodes)
