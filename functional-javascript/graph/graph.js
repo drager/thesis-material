@@ -18,11 +18,15 @@ Graph.prototype.map = function(f) {
   return Graph.of(f(this.__value))
 }
 
+Graph.prototype.join = function() {
+  return this.__value
+}
+
 const map = (f) => (F) => F.map(f)
 
 const findExistingNode = (node, graph) => graph.find(n => n.item === node.item) || node
 
-const createNode = item => Object.freeze({item, successors: [], predecessors: [], visited: false})
+const createNode = item => ({item, successors: [], predecessors: [], visited: false})
 
 const addNewNode = (node, graph) => !graph.find(n => n.item === node.item) ?
                                       graph.concat([node]) : graph

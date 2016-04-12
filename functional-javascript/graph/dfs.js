@@ -6,15 +6,11 @@ const Graph = graph.Graph
 const compose = graph.compose
 const curry = graph.curry
 
-const dfs = (graph, rootNode) => rootNode
-  ? compose(
-      dfsWithRoot(rootNode),
-      map(clearNodes)
-    )(graph, rootNode)
-  : compose(
-      dfsWithGraph,
-      map(clearNodes)
-    )(graph)
+const dfs = (graph, rootNode) =>
+  compose(
+    dfsWithRoot(rootNode),
+    map(clearNodes)
+  )(graph, rootNode)
 
 const clearNodes = nodes => nodes.map(clearNode)
 
@@ -24,32 +20,30 @@ const clearNode = root => {
   return node.visited ? clearNodes(node.successors) : node
 }
 
-const mapNode = rootNode => () => {
-  const nodes = []
-  const node = Object.assign({}, rootNode, {visited: true})
-
+const mapNode = (node, nodes) => () => {
+  node.visited = true
   nodes.push(node)
 
   node.successors.filter(next => !next.visited)
-    .map(next => {
-      next.visited = true
-      nodes.push(next)
-      return mapNode(next)()
-    })
+    .map(next => mapNode(next, nodes)())
+
   return nodes
 }
 
-const dfsWithRoot = rootNode => fNodes => map(mapNode(rootNode))(fNodes)
+const dfsWithRoot = rootNode => fNodes => map(mapNode(rootNode, []))(fNodes)
 
-const dfsWithGraph = fNodes => map(nodes => nodes
-  .filter(node => !node.visited)
-  .map(node => mapNode(node)(nodes))
-  .reduce((a, b) => a.concat(b), []))(fNodes)
+const filterCirular = fNodes => compose(
+  map(graph => graph.filter(node => node.length > 0)),
+  map(graph => graph.map(node => {
+    const suc = node.successors.filter(next => next.item === node.item)
+    const pred = node.predecessors.filter(next => next.item === node.item)
+    return [...suc, ...pred]
+  }))
+)(fNodes)
 
-const isCyclic = fNodes => map(graph =>
-  graph.map(node =>
-    node.successors.filter(next => next === node))
-    .filter(node => node.length > 0).length > 0)(fNodes)
+const isCyclic = fNodes => {
+  return filterCirular(fNodes).join().length > 0
+}
 
 module.exports = {
   dfs,
