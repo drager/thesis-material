@@ -1,3 +1,5 @@
+'use strict'
+
 class Dfs {
 
   dfs(graph, rootNode) {
@@ -14,7 +16,7 @@ class Dfs {
   clearNode(rootNode) {
     rootNode.visited = false
 
-    return rootNode.visited ? clearNodes(rootNode.successors) : rootNode
+    return rootNode.visited ? this.clearNodes(rootNode.successors) : rootNode
   }
 
   dfsWithRoot(rootNode, nodes) {
