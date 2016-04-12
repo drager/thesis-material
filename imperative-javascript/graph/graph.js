@@ -102,6 +102,7 @@ class Node {
     this.successors = new Set()
     this.predecessors = new Set()
     this.item = item
+    this.visited = false
   }
 }
 
