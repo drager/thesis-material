@@ -12,13 +12,14 @@ type Bounds = (Vertex, Vertex)
 -- | An edge from the first vertex to the second.
 type Edge = (Vertex, Vertex)
 
+
 -- | All vertices of a graph.
 vertices :: Graph -> [Vertex]
 vertices  = indices
 
 -- | All edges of a graph.
 edges :: Graph -> [Edge]
-edges g   = [ (v, w) | v <- vertices g, w <- g!v ]
+edges g = [ (v, w) | v <- vertices g, w <- g!v ]
 
 mapTable :: (Vertex -> a -> b) -> Table a -> Table b
 mapTable f t = array (bounds t) [ (,) v (f v (t!v)) | v <- indices t ]
@@ -35,6 +36,9 @@ reverseE :: Graph -> [Edge]
 reverseE g   = [ (w, v) | (v, w) <- edges g ]
 
 -- | A table of the count of edges from each node.
+-- In the where clause a function numEdges is defined with the arguments _ ws.
+-- mapTable is called with the numEdges function as an argument. Since mapTable is curried it will return a function expecting
+-- the last argument which is a graph.
 outdegree :: Graph -> Table Int
 outdegree  = mapTable numEdges
              where numEdges _ ws = length ws
@@ -44,4 +48,5 @@ indegree :: Graph -> Table Int
 indegree  = outdegree . transposeG
 
 
-graph = buildG (50, 53) [(50, 51), (50, 52), (52, 53)]
+-- graph = buildG (50, 53) [(50, 51), (50, 52), (52, 53)]
+graph = buildG (50, 54) [(50, 51), (50, 52), (50, 54), (52, 53)]
