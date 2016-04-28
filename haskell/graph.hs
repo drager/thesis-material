@@ -21,6 +21,10 @@ vertices  = indices
 edges :: Graph -> [Edge]
 edges g = [ (v, w) | v <- vertices g, w <- g!v ]
 
+-- to the right of |: indices t returns an array with integer indexes for the array. Each v is an integer index.
+-- to the left of |: the function will return an array with tuples on the format (v, (f v (t!v)))
+-- (f v (t!v)): the first argument v is ignored (see numEdges in outdegree) and the second argument (t!v) is the array item value in t corresponding
+-- to integer index v.
 mapTable :: (Vertex -> a -> b) -> Table a -> Table b
 mapTable f t = array (bounds t) [ (,) v (f v (t!v)) | v <- indices t ]
 
@@ -50,3 +54,4 @@ indegree  = outdegree . transposeG
 
 -- graph = buildG (50, 53) [(50, 51), (50, 52), (52, 53)]
 graph = buildG (50, 54) [(50, 51), (50, 52), (50, 54), (52, 53)]
+-- graph = buildG (50, 54) [(50, 51), (50, 52), (50, 54), (52, 53)]

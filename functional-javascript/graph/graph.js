@@ -1,12 +1,12 @@
 'use strict'
 
-const compose = (...args) => initial =>
+export const compose = (...args) => initial =>
   args.reduceRight((result, fn) =>
     fn(result), initial)
 
-const curry = (fn, ...args) => (...args2) => fn(...args, ...args2)
+export const curry = (fn, ...args) => (...args2) => fn(...args, ...args2)
 
-const Graph = function(x) {
+export const Graph = function(x) {
   this.__value = x
 }
 
@@ -22,7 +22,7 @@ Graph.prototype.join = function() {
   return this.__value
 }
 
-const map = (f) => (F) => F.map(f)
+export const map = (f) => (F) => F.map(f)
 
 const findExistingNode = (node, graph) => graph.find(n => n.item === node.item) || node
 
@@ -53,18 +53,18 @@ const degreeMap = type => graph => graph.map(edge => [edge.item, edge[type].leng
 
 const degree = (type, Fnodes) => map(degreeMap(type))(Fnodes)
 
-const outDegree = curry(degree, 'successors')
-const inDegree = curry(degree, 'predecessors')
+export const outDegree = curry(degree, 'successors')
+export const inDegree = curry(degree, 'predecessors')
 
-const nodeCount = Fnodes => map(graph => graph.length)(Fnodes)
-const edgeCount = Fnodes => map(graph => graph.reduce((previous, current) =>
+export const nodeCount = Fnodes => map(graph => graph.length)(Fnodes)
+export const edgeCount = Fnodes => map(graph => graph.reduce((previous, current) =>
   previous + current.predecessors.length, 0))(Fnodes)
 
 const deepConvertItemsToNodes = makeNode => items => items.map(item => convertItemsToNodes(makeNode)(item))
 
 const convertItemsToNodes = makeNode => items => items.map(makeNode)
 
-const graph = items => items[0] instanceof Array
+export const graph = items => items[0] instanceof Array
   ? compose(
       addEdges(addEdge),
       map(deepConvertItemsToNodes(createNode))
@@ -72,15 +72,3 @@ const graph = items => items[0] instanceof Array
   : compose(
       map(convertItemsToNodes(createNode))
     )(Graph.of(items))
-
-module.exports = {
-  graph,
-  outDegree,
-  inDegree,
-  nodeCount,
-  edgeCount,
-  Graph,
-  curry,
-  compose,
-  map,
-}

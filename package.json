@@ -13,7 +13,8 @@
     "nodemon": "^1.9.1"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node functional-javascript/graph/test-graph.js"
+    "fgraph": "nodemon --exec babel-node functional-javascript/graph/test-graph.js",
+    "hgraph": "nodemon --exec babel-node functional-javascript/graph-haskell-translated/graph.js"
   },
   "repository": {
     "type": "git",
