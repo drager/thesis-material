@@ -1,23 +1,7 @@
 
 import {compose} from '../graph/graph'
+import {indices, accumArray} from './helpers'
 
-// Helper functions
-const indices = g => g.reduce((acc, v) => acc.concat(...Object.keys(v)), [])
-
-const accumArray = edges0 => edges0.reduce((acc, edge) => {
-    !acc.hasOwnProperty(edge[0]) ?
-      acc[edge[0]] = [].concat([edge[1]]) :
-      acc[edge[0]] = acc[edge[0]].concat([edge[1]])
-
-      if (!acc[edge[0]] || !acc[edge[1]]) {
-        acc[edge[1]] = []
-        return acc
-      }
-
-    return acc
-  }, {})
-
-// Graph functions
 // buildG :: Bounds -> [Edge] -> Graph
 const buildG = edges0 => {
   const graph = accumArray(edges0)
@@ -25,7 +9,6 @@ const buildG = edges0 => {
 }
 // console.log(buildG([[50, 51], [50, 52], [52, 53], [53, 54]]))
 console.log('graph: ', buildG([[50, 51], [50, 52], [50, 54], [52, 53]]))
-
 
 // edges :: Graph -> [Edge]
 const edges = g => g
