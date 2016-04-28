@@ -8,7 +8,7 @@ const curry = graph.curry
 
 const dfs = (graph, rootNode) =>
   compose(
-    map(dfsWithRoot(rootNode)([])),
+    dfsWithRoot(rootNode),
     map(clearNodes)
   )(graph, rootNode)
 
@@ -20,21 +20,17 @@ const clearNode = root => {
   return node.visited ? clearNodes(node.successors) : node
 }
 
-// const mapNode =
-
-const dfsWithRoot = node => a => {
+const mapNode = (node, nodes) => () => {
   node.visited = true
-  let nodes = [...a]
   nodes.push(node)
 
   node.successors.filter(next => !next.visited)
-    .map(next => {
-      // nodes.push(next)
-      dfsWithRoot(next)(nodes)
-    })
+    .map(next => mapNode(next, nodes)())
 
   return nodes
 }
+
+const dfsWithRoot = rootNode => fNodes => map(mapNode(rootNode, []))(fNodes)
 
 const filterCirular = fNodes => compose(
   map(graph => graph.filter(node => node.length > 0)),
