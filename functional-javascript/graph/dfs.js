@@ -1,12 +1,14 @@
 'use strict'
 
-const graph = require('./graph')
-const map = graph.map
-const Graph = graph.Graph
-const compose = graph.compose
-const curry = graph.curry
+import {
+  graph,
+  map,
+  Graph,
+  compose,
+  curry
+} from './graph'
 
-const dfs = (graph, rootNode) =>
+export const dfs = (graph, rootNode) =>
   compose(
     dfsWithRoot(rootNode),
     map(clearNodes)
@@ -41,11 +43,6 @@ const filterCirular = fNodes => compose(
   }))
 )(fNodes)
 
-const isCyclic = fNodes => {
+export const isCyclic = fNodes => {
   return filterCirular(fNodes).join().length > 0
-}
-
-module.exports = {
-  dfs,
-  isCyclic,
 }
