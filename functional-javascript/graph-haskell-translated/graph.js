@@ -24,7 +24,7 @@ const vertices = indices
 
 // [{'50': [54,52,51]}, {'51': []}, {'52': [53]}, {'53': []}, {'54': []}] => [{54: 50}, {52: 50}, {51: 50}, {53: 52}]
 // reverseE :: Graph -> [Edge]
-const reverseE = g => edges(g).map(edge => [].concat(edge.reverse()))
+const reverseE = g => edges(g).map(edge => [...edge.reverse()])
 console.log('reverseE: ', reverseE(buildG([[50, 51], [50, 52], [50, 54], [52, 53]])))
 
 // transposeG  :: Graph -> Graph
