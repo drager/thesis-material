@@ -22,7 +22,7 @@ Graph.prototype.join = function() {
   return this.__value
 }
 
-export const map = (f) => (F) => F.map(f)
+export const Fmap = (f) => (F) => F.map(f)
 
 const findExistingNode = (node, graph) => graph.find(n => n.item === node.item) || node
 
@@ -41,23 +41,23 @@ const addEdge = (from, to, graph) => {
   return resultGraph
 }
 
-const reduce = connect => Fnodes => Fnodes.reduce((graph, pair) => {
+const Freduce = connect => Fnodes => Fnodes.reduce((graph, pair) => {
   const to = findExistingNode(pair[1], graph)
   const from = findExistingNode(pair[0], graph)
   return connect(from, to, graph)
 }, [])
 
-const addEdges = connect => Fnodes => map(reduce(connect))(Fnodes)
+const addEdges = connect => Fnodes => Fmap(Freduce(connect))(Fnodes)
 
 const degreeMap = type => graph => graph.map(edge => [edge.item, edge[type].length])
 
-const degree = (type, Fnodes) => map(degreeMap(type))(Fnodes)
+const degree = (type, Fnodes) => Fmap(degreeMap(type))(Fnodes)
 
 export const outDegree = curry(degree, 'successors')
 export const inDegree = curry(degree, 'predecessors')
 
-export const nodeCount = Fnodes => map(graph => graph.length)(Fnodes)
-export const edgeCount = Fnodes => map(graph => graph.reduce((previous, current) =>
+export const nodeCount = Fnodes => Fmap(graph => graph.length)(Fnodes)
+export const edgeCount = Fnodes => Fmap(graph => graph.reduce((previous, current) =>
   previous + current.predecessors.length, 0))(Fnodes)
 
 const deepConvertItemsToNodes = makeNode => items => items.map(item => convertItemsToNodes(makeNode)(item))
@@ -67,8 +67,8 @@ const convertItemsToNodes = makeNode => items => items.map(makeNode)
 export const graph = items => items[0] instanceof Array
   ? compose(
       addEdges(addEdge),
-      map(deepConvertItemsToNodes(createNode))
+      Fmap(deepConvertItemsToNodes(createNode))
     )(Graph.of(items))
   : compose(
-      map(convertItemsToNodes(createNode))
+      Fmap(convertItemsToNodes(createNode))
     )(Graph.of(items))

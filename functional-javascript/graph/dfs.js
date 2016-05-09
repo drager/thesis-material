@@ -2,7 +2,7 @@
 
 import {
   graph,
-  map,
+  Fmap,
   Graph,
   compose,
   curry
@@ -11,7 +11,7 @@ import {
 export const dfs = (graph, rootNode) =>
   compose(
     dfsWithRoot(rootNode),
-    map(clearNodes)
+    Fmap(clearNodes)
   )(graph, rootNode)
 
 const clearNodes = nodes => nodes.map(clearNode)
@@ -32,11 +32,11 @@ const mapNode = (node, nodes) => () => {
   return nodes
 }
 
-const dfsWithRoot = rootNode => fNodes => map(mapNode(rootNode, []))(fNodes)
+const dfsWithRoot = rootNode => fNodes => Fmap(mapNode(rootNode, []))(fNodes)
 
 const filterCirular = fNodes => compose(
-  map(graph => graph.filter(node => node.length > 0)),
-  map(graph => graph.map(node => {
+  Fmap(graph => graph.filter(node => node.length > 0)),
+  Fmap(graph => graph.map(node => {
     const suc = node.successors.filter(next => next.item === node.item)
     const pred = node.predecessors.filter(next => next.item === node.item)
     return [...suc, ...pred]
